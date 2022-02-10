@@ -18,7 +18,9 @@ func NewUpdateUserRequest() *UpdateUserRequest {
 }
 
 type UpdateUserRequest struct {
+	ID          int    `json:"id,omitempty"`
 	DisplayName string `json:"display_name"`
+	Email string `json:"email"`
 }
 
 func (c *UpdateUserRequest) Bind(r *http.Request) error { return nil }

@@ -3,6 +3,8 @@ package app
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/wubba-com/testApp/internal/app/composite"
+	"log"
 	"net/http"
 	"time"
 )
@@ -16,6 +18,9 @@ func Run()  {
 	//r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	u := composite.NewUserComposite(5 * time.Second)
+	u.Handler.Register(r)
 
-	http.ListenAndServe(":3333", r)
+	log.Fatal(http.ListenAndServe(":3333", r))
+
 }
