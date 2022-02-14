@@ -1,16 +1,18 @@
-package user
+package http
 
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/wubba-com/testApp/internal/app/user/delivery"
+	"github.com/wubba-com/testApp/internal/app/user/delivery/http/validator"
 	"github.com/wubba-com/testApp/pkg/render"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/wubba-com/testApp/internal/app/domain/user"
+	"github.com/wubba-com/testApp/internal/app/domains/user"
+
 )
 
 const(
@@ -64,6 +66,15 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request)  {
 	input := user.NewCreateUserRequest()
 
 	if err := render.Bind(r, input); err != nil {
+		log.Println(err)
+		err = render.Render(w, r, res.ErrInvalidRequest(err))
+		if err != nil {
+			log.Println(err)
+		}
+		return
+	}
+
+	if ok, err := isCreateUserReqValid(input); !ok {
 		err = render.Render(w, r, res.ErrInvalidRequest(err))
 		if err != nil {
 			log.Println(err)
@@ -123,7 +134,13 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request)  {
 		return
 	}
 	input.ID = id
-	log.Printf("input: %v", input.DisplayName)
+	if ok, err := isUpdateUserReqValid(input); !ok {
+		err = render.Render(w, r, res.ErrInvalidRequest(err))
+		if err != nil {
+			log.Printf(err.Error())
+		}
+		return
+	}
 	err = h.Service.UpdateUser(r.Context(), input)
 	if err != nil {
 		err = render.Render(w, r, res.ErrInvalidRequest(err))
@@ -152,4 +169,14 @@ func (h *Handler) deleteUser(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	render.Status(r, http.StatusNoContent)
+}
+
+func isCreateUserReqValid(input *user.CreateUserRequest) (bool, error) {
+	v := validator.CreateUserRequestValid{}
+	return v.IsValid(input)
+}
+
+func isUpdateUserReqValid(input *user.UpdateUserRequest) (bool, error) {
+	v := validator.UpdateUserRequestValid{}
+	return v.IsValid(input)
 }

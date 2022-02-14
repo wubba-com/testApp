@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"github.com/wubba-com/testApp/internal/app/domain/user"
+	"github.com/wubba-com/testApp/internal/app/domains/user"
 	"time"
 )
 

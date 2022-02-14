@@ -5,16 +5,13 @@ import (
 	"time"
 )
 
-func NewUser() *User {
-	return &User{}
-}
-
 func NewStore() *Store {
 	return &Store{}
 }
 
 type (
 	User struct {
+		UpdateAt time.Time `json:"update_at"`
 		CreatedAt   time.Time `json:"created_at"`
 		DisplayName string    `json:"display_name"`
 		Email       string    `json:"email"`

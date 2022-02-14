@@ -1,8 +1,9 @@
-PATCH http://localhost:3333/api/v1/users/1
+PATCH http://localhost:3333/api/v1/users/4
 Content-Type: application/json
 
 {
-  "display_name": "TEST5"
+  "display_name": "test2",
+  "email": "test22@gmail.com"
 }
 
 ###
