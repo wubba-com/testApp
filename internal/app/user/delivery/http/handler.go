@@ -12,11 +12,10 @@ import (
 	"time"
 
 	"github.com/wubba-com/testApp/internal/app/domains/user"
-
 )
 
-const(
-	urlUser = "/users"
+const (
+	urlUser  = "/users"
 	endPoint = "/"
 )
 
@@ -28,7 +27,7 @@ type Handler struct {
 	Service user.Service
 }
 
-func (h *Handler) Register(r chi.Router)  {
+func (h *Handler) Register(r chi.Router) {
 	r.Get("/", h.welcome)
 
 	r.Route("/api", func(r chi.Router) {
@@ -47,11 +46,11 @@ func (h *Handler) Register(r chi.Router)  {
 	})
 }
 
-func (h *Handler) welcome(w http.ResponseWriter, r *http.Request)  {
+func (h *Handler) welcome(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(time.Now().String()))
 }
 
-func (h *Handler) searchUsers(w http.ResponseWriter, r *http.Request)  {
+func (h *Handler) searchUsers(w http.ResponseWriter, r *http.Request) {
 
 	uStore, err := h.Service.SearchUsers(r.Context())
 	if err != nil {
@@ -62,7 +61,7 @@ func (h *Handler) searchUsers(w http.ResponseWriter, r *http.Request)  {
 	render.JSON(w, r, uStore.List)
 }
 
-func (h *Handler) createUser(w http.ResponseWriter, r *http.Request)  {
+func (h *Handler) createUser(w http.ResponseWriter, r *http.Request) {
 	input := user.NewCreateUserRequest()
 
 	if err := render.Bind(r, input); err != nil {
@@ -93,7 +92,7 @@ func (h *Handler) createUser(w http.ResponseWriter, r *http.Request)  {
 	})
 }
 
-func (h *Handler) getUser(w http.ResponseWriter, r *http.Request)  {
+func (h *Handler) getUser(w http.ResponseWriter, r *http.Request) {
 	queryID := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(queryID)
@@ -117,7 +116,7 @@ func (h *Handler) getUser(w http.ResponseWriter, r *http.Request)  {
 	render.JSON(w, r, u)
 }
 
-func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request)  {
+func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request) {
 	input := user.NewUpdateUserRequest()
 
 	if err := render.Bind(r, input); err != nil {
@@ -151,24 +150,27 @@ func (h *Handler) updateUser(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	render.Status(r, http.StatusNoContent)
+	render.JSON(w, r, nil)
 }
 
-func (h *Handler) deleteUser(w http.ResponseWriter, r *http.Request)  {
+func (h *Handler) deleteUser(w http.ResponseWriter, r *http.Request) {
 	queryID := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(queryID)
 	if err != nil {
 		return
 	}
 
-	id, err = h.Service.DeleteUser(r.Context(), id)
+	_, err = h.Service.DeleteUser(r.Context(), id)
 	if err != nil {
 		err = render.Render(w, r, res.ErrInvalidRequest(err))
 		if err != nil {
-			return
+			log.Printf(err.Error())
 		}
+		return
 	}
 
 	render.Status(r, http.StatusNoContent)
+	render.JSON(w, r, nil)
 }
 
 func isCreateUserReqValid(input *user.CreateUserRequest) (bool, error) {
